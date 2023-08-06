@@ -90,6 +90,18 @@ func (l *Lexer) NextToken() token.Token {
 		tokenType = token.COMMA
 	case '+':
 		tokenType = token.PLUS
+	case '-':
+		tokenType = token.MINUS
+	case '!':
+		tokenType = token.BANG
+	case '/':
+		tokenType = token.SLASH
+	case '*':
+		tokenType = token.ASTERISK
+	case '<':
+		tokenType = token.LT
+	case '>':
+		tokenType = token.GT
 	case '{':
 		tokenType = token.LBRACE
 	case '}':

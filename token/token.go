@@ -8,11 +8,16 @@ type Token struct {
 
 const (
 	ILLEGAL   = "ILLEGAL"
-	EOF       = "EOF"
 	IDENT     = "IDENT"
 	INT       = "INT"
-	ASSIGN    = "ASSIGN"
-	PLUS      = "PLUS"
+	ASSIGN    = "="
+	LT        = "<"
+	GT        = ">"
+	PLUS      = "+"
+	MINUS     = "-"
+	BANG      = "!"
+	ASTERISK  = "*"
+	SLASH     = "/"
 	COMMA     = ","
 	SEMICOLON = ";"
 	LPAREN    = "("
@@ -21,6 +26,7 @@ const (
 	RBRACE    = "}"
 	FUNCTION  = "FUNCTION"
 	LET       = "LET"
+	EOF       = "EOF"
 )
 
 var keywords = map[string]TokenType{
@@ -36,14 +42,23 @@ func LookupIdent(ident string) TokenType {
 	return IDENT
 }
 
-// {token.LET, "let"},
+// {token.ILLEGAL, ""},
+// {token.IDENT, "ident"},
+// {token.INT, "000"},
 // {token.ASSIGN, "="},
+// {token.LT, "<"},
+// {token.GT, ">"},
 // {token.PLUS, "+"},
+// {token.MINUS, "-"},
+// {token.BANG, "!"},
+// {token.ASTERISK, "*"},
+// {token.SLASH, "/"},
+// {token.COMMA, ","},
+// {token.SEMICOLON, ";"},
 // {token.LPAREN, "("},
 // {token.RPAREN, ")"},
 // {token.LBRACE, "{"},
 // {token.RBRACE, "}"},
-// {token.COMMA, ","},
-// {token.SEMICOLON, ";"},
 // {token.FUNCTION, "fn"},
+// {token.LET, "let"},
 // {token.EOF, ""},
