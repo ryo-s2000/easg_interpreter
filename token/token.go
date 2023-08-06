@@ -6,16 +6,22 @@ type Token struct {
 	Literal string
 }
 
+func New(tokenType TokenType, literal string) *Token {
+	return &Token{Type: tokenType, Literal: literal}
+}
+
 const (
 	ILLEGAL   = "ILLEGAL"
 	IDENT     = "IDENT"
 	INT       = "INT"
 	ASSIGN    = "="
+	BANG      = "!"
+	EQ        = "=="
+	NOT_EQ    = "!="
 	LT        = "<"
 	GT        = ">"
 	PLUS      = "+"
 	MINUS     = "-"
-	BANG      = "!"
 	ASTERISK  = "*"
 	SLASH     = "/"
 	COMMA     = ","
@@ -51,29 +57,3 @@ func LookupIdent(ident string) TokenType {
 
 	return IDENT
 }
-
-// {token.ILLEGAL, ""},
-// {token.IDENT, "ident"},
-// {token.INT, "000"},
-// {token.ASSIGN, "="},
-// {token.LT, "<"},
-// {token.GT, ">"},
-// {token.PLUS, "+"},
-// {token.MINUS, "-"},
-// {token.BANG, "!"},
-// {token.ASTERISK, "*"},
-// {token.SLASH, "/"},
-// {token.COMMA, ","},
-// {token.SEMICOLON, ";"},
-// {token.LPAREN, "("},
-// {token.RPAREN, ")"},
-// {token.LBRACE, "{"},
-// {token.RBRACE, "}"},
-// {token.LET, "let"},
-// {token.FUNCTION, "fn"},
-// {token.TRUE, "true"},
-// {token.FALSE, "false"},
-// {token.IF, "if"},
-// {token.ELSE, "else"},
-// {token.RETURN, "return"},
-// {token.EOF, ""},

@@ -12,66 +12,33 @@ type Lexer struct {
 }
 
 func New(input string) *Lexer {
-	l := &Lexer{input: input}
-	return l
+	return &Lexer{input: input}
+}
+
+func (l *Lexer) peekChar() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	} else {
+		return l.input[l.readPosition]
+	}
 }
 
 func (l *Lexer) readChar() {
-	if l.readPosition >= len(l.input) {
-		l.ch = 0
-	} else {
-		l.ch = l.input[l.readPosition]
-	}
+	l.ch = l.peekChar()
 	l.position = l.readPosition
 	l.readPosition += 1
 }
 
-func (l *Lexer) nextChIsWhiteSpace() bool {
-	if l.readPosition < len(l.input) {
-		ch := l.input[l.readPosition]
-		return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
-	}
-	return false
-}
-
-func (l *Lexer) nextChIsLetter() bool {
-	if l.readPosition < len(l.input) {
-		return isLetter(l.input[l.readPosition])
-	}
-	return false
-}
-
-func (l *Lexer) nextChIsNumber() bool {
-	if l.readPosition < len(l.input) {
-		return isDigit(l.input[l.readPosition])
-	}
-	return false
-}
-
-func (l *Lexer) skipWhiteSpace() {
-	for l.nextChIsWhiteSpace() {
-		l.readChar()
-	}
-}
-
-func (l *Lexer) readIdentifier() string {
+func (l *Lexer) readString(judgFunc func(byte) bool) string {
 	start_position := l.position
-	for l.nextChIsLetter() {
-		l.readChar()
-	}
-	return l.input[start_position : l.position+1]
-}
-
-func (l *Lexer) readNumber() string {
-	start_position := l.position
-	for l.nextChIsNumber() {
+	for judgFunc(l.peekChar()) {
 		l.readChar()
 	}
 	return l.input[start_position : l.position+1]
 }
 
 func (l *Lexer) NextToken() token.Token {
-	l.skipWhiteSpace()
+	l.readString(isWhiteSpace) // Delete WhiteSpace
 	l.readChar()
 
 	var tokenType token.TokenType
@@ -79,7 +46,21 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case '=':
-		tokenType = token.ASSIGN
+		if l.peekChar() == '=' {
+			l.readChar()
+			tokenType = token.EQ
+			literal = "=="
+		} else {
+			tokenType = token.ASSIGN
+		}
+	case '!':
+		if l.peekChar() == '=' {
+			l.readChar()
+			tokenType = token.NOT_EQ
+			literal = "!="
+		} else {
+			tokenType = token.BANG
+		}
 	case ';':
 		tokenType = token.SEMICOLON
 	case '(':
@@ -92,8 +73,6 @@ func (l *Lexer) NextToken() token.Token {
 		tokenType = token.PLUS
 	case '-':
 		tokenType = token.MINUS
-	case '!':
-		tokenType = token.BANG
 	case '/':
 		tokenType = token.SLASH
 	case '*':
@@ -111,15 +90,15 @@ func (l *Lexer) NextToken() token.Token {
 		literal = ""
 	default:
 		if isLetter(l.ch) {
-			literal = l.readIdentifier()
+			literal = l.readString(isLetter)
 			tokenType = token.LookupIdent(literal)
 		} else if isDigit(l.ch) {
+			literal = l.readString(isDigit)
 			tokenType = token.INT
-			literal = l.readNumber()
 		} else {
 			tokenType = token.ILLEGAL
 		}
 	}
 
-	return newToken(tokenType, literal)
+	return *token.New(tokenType, literal)
 }
