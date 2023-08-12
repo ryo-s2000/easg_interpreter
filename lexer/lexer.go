@@ -34,7 +34,12 @@ func (l *Lexer) readString(judgFunc func(byte) bool) string {
 	for judgFunc(l.peekChar()) {
 		l.readChar()
 	}
-	return l.input[start_position : l.position+1]
+
+	if l.position == len(l.input) {
+		return l.input[start_position:l.position]
+	} else {
+		return l.input[start_position : l.position+1]
+	}
 }
 
 func (l *Lexer) NextToken() token.Token {
