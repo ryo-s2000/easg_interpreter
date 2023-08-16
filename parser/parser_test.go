@@ -6,6 +6,19 @@ import (
 	"testing"
 )
 
+func exsitParserErrors(t *testing.T, p *Parser) bool {
+	errors := p.Errors()
+	if len(errors) == 0 {
+		return false
+	}
+
+	t.Errorf("parser has %d errors", len(errors))
+	for _, msg := range errors {
+		t.Errorf("parser error: %q", msg)
+	}
+	return true
+}
+
 func TestLetStatements(t *testing.T) {
 	input := `let x = 5;
 			  let y = 10;
@@ -15,7 +28,7 @@ func TestLetStatements(t *testing.T) {
 	p := New(l)
 
 	program := p.ParseProgram()
-	if checkExsitParserErrors(t, p) {
+	if exsitParserErrors(t, p) {
 		t.FailNow()
 	}
 	if program == nil {
@@ -39,19 +52,6 @@ func TestLetStatements(t *testing.T) {
 			return
 		}
 	}
-}
-
-func checkExsitParserErrors(t *testing.T, p *Parser) bool {
-	errors := p.Errors()
-	if len(errors) == 0 {
-		return false
-	}
-
-	t.Errorf("parser has %d errors", len(errors))
-	for _, msg := range errors {
-		t.Errorf("parser error: %q", msg)
-	}
-	return true
 }
 
 func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
@@ -86,7 +86,7 @@ func TestReturnStatemnts(t *testing.T) {
 	p := New(l)
 	program := p.ParseProgram()
 
-	if checkExsitParserErrors(t, p) {
+	if exsitParserErrors(t, p) {
 		t.FailNow()
 	}
 	if len(program.Statements) != 3 {
@@ -102,5 +102,34 @@ func TestReturnStatemnts(t *testing.T) {
 		if returnStmt.TokenLiteral() != "return" {
 			t.Errorf("returnStmt.TokenLiteral not 'return', got %q", returnStmt.TokenLiteral())
 		}
+	}
+}
+
+func TestIdentifierExpression(t *testing.T) {
+	input := "foobar;"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	if exsitParserErrors(t, p) {
+		t.FailNow()
+	}
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d", len(program.Statements))
+	}
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatements got=%T", program.Statements[0])
+	}
+
+	ident, ok := stmt.Expression.(*ast.Identifier)
+	if !ok {
+		t.Fatalf("exp not *ast.Identifier. got=%T", stmt.Expression)
+	}
+	if ident.Value != "foobar" {
+		t.Errorf("ident.Value not %s. got=%s", "foobar", ident.Value)
+	}
+	if ident.TokenLiteral() != "foobar" {
+		t.Errorf("ident.TokenLiteral not %s. got=%s", "foobar", ident.TokenLiteral())
 	}
 }
