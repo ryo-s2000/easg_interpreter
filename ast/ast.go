@@ -133,6 +133,15 @@ func (pe *PrefixExpression) String() string {
 	return out.String()
 }
 
+type Boolen struct {
+	Token token.Token
+	Value bool
+}
+
+func (b *Boolen) expressionNode()      {}
+func (b *Boolen) TokenLiteral() string { return b.Token.Literal }
+func (b *Boolen) String() string       { return b.Token.Literal }
+
 type Program struct {
 	Statements []Statement
 }
