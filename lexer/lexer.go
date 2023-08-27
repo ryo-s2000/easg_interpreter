@@ -37,9 +37,13 @@ func (l *Lexer) readString(judgFunc func(byte) bool) string {
 
 	if l.position == len(l.input) {
 		return l.input[start_position:l.position]
-	} else {
+	}
+
+	if l.position < len(l.input) {
 		return l.input[start_position : l.position+1]
 	}
+
+	return ""
 }
 
 func (l *Lexer) NextToken() token.Token {
