@@ -14,10 +14,12 @@ func TestEvalIntegerExpressinon(t *testing.T) {
 	}{
 		{"5", 5},
 		{"10", 10},
+		{"-5", -5},
+		{"-10", -10},
 	}
 
 	for _, tt := range tests {
-		evaluated := testEval(tt.input)
+		evaluated := execEval(tt.input)
 		testIntegerObject(t, evaluated, tt.expected)
 	}
 }
@@ -32,12 +34,12 @@ func TestEvalBooleaninon(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		evaluated := testEval(tt.input)
+		evaluated := execEval(tt.input)
 		testBooleanObject(t, evaluated, tt.expected)
 	}
 }
 
-func testEval(input string) object.Object {
+func execEval(input string) object.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
 	program := p.ParseProgram()
@@ -71,4 +73,24 @@ func testBooleanObject(t *testing.T, obj object.Object, expected bool) bool {
 	}
 
 	return true
+}
+
+func TestBangOperator(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{"!true", false},
+		{"!false", true},
+		{"!5", false},
+		{"!!true", true},
+		{"!!false", false},
+		{"!!5", true},
+		{"!!5", true},
+	}
+
+	for _, tt := range tests {
+		evaluated := execEval(tt.input)
+		testBooleanObject(t, evaluated, tt.expected)
+	}
 }
