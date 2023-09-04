@@ -234,3 +234,61 @@ func TestLetStatement(t *testing.T) {
 		testIntegerObject(t, evaluated, tt.expected)
 	}
 }
+
+func TestFunctionObject(t *testing.T) {
+	input := "fn(x) { x + 2; };"
+
+	evaluated := execEval(input)
+	fn, ok := evaluated.(*object.Function)
+	if !ok {
+		t.Errorf("object is not Function. got=%T", evaluated)
+	}
+	if len(fn.Parameters) != 1 {
+		t.Errorf("function has wrong parameters. Parameters=%+v", fn.Parameters)
+	}
+	if fn.Parameters[0].String() != "x" {
+		t.Errorf("parameter is not 'x. got=%q", fn.Parameters[0])
+	}
+	expectedBody := "(x + 2)"
+
+	if fn.Body.String() != expectedBody {
+		t.Errorf("body is not %q. got=%q", expectedBody, fn.Body.String())
+	}
+}
+
+func TestFunctionApplication(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"let identity = fn(x) { x; }; identity(5);", 5},
+		{"let identity = fn(x) { return x; }; identity(5);", 5},
+		{"let double = fn(x) { return x * 2; }; double(5);", 10},
+		{"let add = fn(x, y) { return x + y; }; add(5, 5);", 10},
+		{"let add = fn(x, y) { return x + y; }; add(5 + 5, add(5 , 5));", 20},
+		{"fn(x) { x; }(5)", 5},
+	}
+
+	for _, tt := range tests {
+		evaluated := execEval(tt.input)
+		testIntegerObject(t, evaluated, tt.expected)
+	}
+}
+
+func TestClosures(t *testing.T) {
+	input := `let c = fn(x) { fn(y) { x + y } };
+	          let cc = c(2);
+			  cc(2) + cc(2)`
+	evaluated := execEval(input)
+	testIntegerObject(t, evaluated, 8)
+}
+
+func TestHigherOrderFunction(t *testing.T) {
+	input := `let add = fn(a, b){ a + b };
+	          let sub = fn(a, b){ a - b };
+			  let apply = fn(a, b, func) { func(a,b) }
+			  apply(10, 2, add) + apply(5, 3, sub)
+			  `
+	evaluated := execEval(input)
+	testIntegerObject(t, evaluated, 14)
+}
