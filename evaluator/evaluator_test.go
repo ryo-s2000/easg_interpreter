@@ -202,6 +202,10 @@ func TestErrorHandling(t *testing.T) {
 			"foobar",
 			"identifier not found: foobar",
 		},
+		{
+			`"Hello" - "World"`,
+			"unknow operator: STRING - STRING",
+		},
 	}
 
 	for _, tt := range tests {
@@ -291,4 +295,18 @@ func TestHigherOrderFunction(t *testing.T) {
 			  `
 	evaluated := execEval(input)
 	testIntegerObject(t, evaluated, 14)
+}
+
+func TestStringbConcat(t *testing.T) {
+	input := `"Hello " + " " + "World!"`
+
+	evaluated := execEval(input)
+	str, ok := evaluated.(*object.String)
+	if !ok {
+		t.Fatalf("object is not String. got=%T (%+v)", evaluated, evaluated)
+	}
+
+	if str.Value != "Hello  World!" {
+		t.Errorf("String has wrong value, got=%q", str.Value)
+	}
 }
