@@ -70,6 +70,11 @@ func (l *Lexer) NextToken() token.Token {
 		} else {
 			tokenType = token.BANG
 		}
+	case '"':
+		tokenType = token.STRING
+		l.readChar() // 初めの「"」を飛ばす
+		literal = l.readString(isString)
+		l.readChar() // 最後の「"」を飛ばす
 	case ';':
 		tokenType = token.SEMICOLON
 	case '(':

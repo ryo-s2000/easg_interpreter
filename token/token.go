@@ -14,6 +14,7 @@ const (
 	ILLEGAL   = "ILLEGAL"
 	IDENT     = "IDENT"
 	INT       = "INT"
+	STRING    = "STRING"
 	ASSIGN    = "="
 	BANG      = "!"
 	EQ        = "=="
