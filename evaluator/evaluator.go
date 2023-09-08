@@ -194,10 +194,15 @@ func evalIndexExpression(left, index object.Object) object.Object {
 
 func evalArrayIndexExpression(array, index object.Object) object.Object {
 	arrayObject := array.(*object.Array)
-	idx := index.(*object.Integer).Value
-	max := int64(len(arrayObject.Elements) - 1)
+	indexValue := index.(*object.Integer).Value
+	length := int64(len(arrayObject.Elements))
 
-	if idx < 0 || idx > max {
+	idx := indexValue
+	if indexValue < 0 {
+		idx += length
+	}
+
+	if idx < 0 || idx > length-1 {
 		return NULL
 	}
 
